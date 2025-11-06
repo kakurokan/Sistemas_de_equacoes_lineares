@@ -1,7 +1,5 @@
 from sympy import *
 
-init_printing(use_unicode=True)
-
 
 class IteracoesExcedidas(Exception):
     pass
@@ -17,15 +15,39 @@ def norma(matriz_a, matriz_b):
     return max(resultado, key=abs)
 
 
-def jacobi(n, coeficiente, coluna, tol, n_max):
+def gauss_seidel(n, coeficiente, coluna, tol, n_max):
     k = 0
     elementos_x = []
     for i in range(n):
         elementos_x.append(0)
     matriz_x = criar_matriz(elementos_x)
+    matriz_a = coeficiente.copy()
+    matriz_b = coluna.copy()
 
-    matriz_a = coeficiente
-    matriz_b = coluna
+    while k < n_max:
+        x_anterior = matriz_x.copy()
+        for i in range(n):
+            soma = 0
+            for j in range(n):  # calcula cada linha, ou seja o valor de xi
+                if i != j:
+                    soma += matriz_a[i, j] * matriz_x[j]
+            temp = matriz_a[i, i]
+            matriz_x[i] = (matriz_b[i] - soma) / temp
+
+        if norma(matriz_x, x_anterior) < tol:
+            return matriz_x
+
+        k += 1
+
+    raise IteracoesExcedidas
+
+
+def jacobi(n, coeficiente, coluna, tol, n_max):
+    k = 1
+
+    matriz_a = coeficiente.copy()
+    matriz_b = coluna.copy()
+    matriz_x = matriz_b.copy()
 
     for i in range(n):
         divisor = matriz_a[i, i] * (-1)
@@ -60,6 +82,8 @@ def main():
 
     matriz = criar_matriz(coeficientes)
 
+    pprint(matriz)
+
     print("Escreva os valores da matriz coluna B de tamanho n, separados por espaço: ")
     partes = input().split(" ")
     coluna = criar_matriz(partes)
@@ -68,12 +92,12 @@ def main():
     n_max = int(input("Insira o número máximo de iterações: "))
 
     try:
-        result = jacobi(n, matriz, coluna, tol, n_max)
+        result = gauss_seidel(n, matriz, coluna, tol, n_max)
 
         def f(element):
             return element.evalf(5)
 
-        pretty_print(result.applyfunc(f))
+        pprint(result.applyfunc(f))
 
     except IteracoesExcedidas:
         print("Número máximo de iterações excedido")

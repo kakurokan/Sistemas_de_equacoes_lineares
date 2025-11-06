@@ -17,12 +17,15 @@ def norma(matriz_a, matriz_b):
     return max(resultado, key=abs)
 
 
-def jacobi(n, matriz_a, matriz_b, tol, n_max):
+def jacobi(n, coeficiente, coluna, tol, n_max):
     k = 0
     elementos_x = []
     for i in range(n):
         elementos_x.append(0)
     matriz_x = criar_matriz(elementos_x)
+
+    matriz_a = coeficiente
+    matriz_b = coluna
 
     for i in range(n):
         divisor = matriz_a[i, i] * (-1)
@@ -35,8 +38,10 @@ def jacobi(n, matriz_a, matriz_b, tol, n_max):
 
     while k < n_max:
         result = matriz_a * matriz_x + matriz_b
-        matrix_x = result
-        pretty_print(matrix_x)
+        if norma(matriz_x, result) < tol:
+            return result
+
+        matriz_x = result
         k += 1
 
     raise IteracoesExcedidas
@@ -48,7 +53,6 @@ def main():
         "Escreva a matriz A (coeficientes) de tamanho n x n, separando as colunas por espaço e linhas por parágrafos:")
 
     coeficientes = []
-    valores_b = []
 
     for i in range(n):
         numeros = input().split(" ")
@@ -60,13 +64,19 @@ def main():
     partes = input().split(" ")
     coluna = criar_matriz(partes)
 
-    tol = input("Insira a tolerância absoluta: ")
-    n_max = input("Insira o número máximo de iterações: ")
+    tol = float(input("Insira a tolerância absoluta: "))
+    n_max = int(input("Insira o número máximo de iterações: "))
 
     try:
-        jacobi(n, matriz, coluna, tol, n_max)
+        result = jacobi(n, matriz, coluna, tol, n_max)
+
+        def f(element):
+            return element.evalf(5)
+
+        pretty_print(result.applyfunc(f))
+
     except IteracoesExcedidas:
-        print("O número de iterações excedeu o limite dado.")
+        print("Número máximo de iterações excedido")
 
 
 main()

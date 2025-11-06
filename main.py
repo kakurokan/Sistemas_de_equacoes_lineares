@@ -3,9 +3,18 @@ from sympy import *
 init_printing(use_unicode=True)
 
 
+class IteracoesExcedidas(Exception):
+    pass
+
+
 def criar_matriz(elementos):
-    matrix_x = [sympify(n) for n in elementos]
-    return Matrix(matrix_x)
+    matrix = [sympify(n) for n in elementos]
+    return Matrix(matrix)
+
+
+def norma(matriz_a, matriz_b):
+    resultado = matriz_b - matriz_a
+    return max(resultado, key=abs)
 
 
 def jacobi(n, matriz_a, matriz_b, tol, n_max):
@@ -25,8 +34,12 @@ def jacobi(n, matriz_a, matriz_b, tol, n_max):
         matriz_b[i, 0] /= ((-1) * divisor)
 
     while k < n_max:
-        matriz_x = matriz_a * matriz_x + matriz_b
-         k += 1
+        result = matriz_a * matriz_x + matriz_b
+        matrix_x = result
+        pretty_print(matrix_x)
+        k += 1
+
+    raise IteracoesExcedidas
 
 
 def main():
@@ -50,7 +63,10 @@ def main():
     tol = input("Insira a tolerância absoluta: ")
     n_max = input("Insira o número máximo de iterações: ")
 
-    jacobi(n, matriz, coluna, tol, n_max)
+    try:
+        jacobi(n, matriz, coluna, tol, n_max)
+    except IteracoesExcedidas:
+        print("O número de iterações excedeu o limite dado.")
 
 
 main()

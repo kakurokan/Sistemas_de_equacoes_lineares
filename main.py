@@ -9,6 +9,20 @@ class DimensoesErradas(Exception):
     pass
 
 
+def Diagonalmente_Dominante(matriz_a):
+
+    for i in range (len(matriz_a)):
+        soma = 0
+        for j in range (len(matriz_a)):
+            soma += abs(matriz_a[i][j])
+
+        soma -= abs(matriz_a[i][i])
+
+        if abs(matriz_a[i][i]) < soma:
+            return False
+
+    return True
+
 def verifica_matriz(matriz, n):
     for i in range(n):
         if matriz[i, i] == 0:

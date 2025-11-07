@@ -37,7 +37,7 @@ def criar_matriz(elementos):
 
 def norma(matriz_a, matriz_b):
     resultado = matriz_b - matriz_a
-    return max(resultado, key=abs)
+    return abs(max(resultado, key=abs))
 
 
 def seidel(n, coeficiente, coluna, tol, n_max):
@@ -70,7 +70,8 @@ def jacobi(n, coeficiente, coluna, tol, n_max):
 
     matriz_a = coeficiente.copy()
     matriz_b = coluna.copy()
-    matriz_x = matriz_b.copy()
+    elementos_x = [0] * n
+    matriz_x = criar_matriz(elementos_x)
 
     for i in range(n):
         divisor = matriz_a[i, i] * (-1)
@@ -96,14 +97,13 @@ def main():
     print("*" * 65)
     print("   Bem-vindo ao Solucionador de sistemas lineares (Ax = B)")
     print("*" * 65)
-    print("")
 
     n = 0
     rodando = true
 
     while rodando:
         try:
-            n = int(input("Insira o número de equações/incógnitas: "))
+            n = int(input("\nInsira o número de equações/incógnitas: "))
             if n <= 0:
                 raise ValueError("Número inválido")
 

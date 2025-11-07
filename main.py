@@ -51,13 +51,13 @@ def seidel(n, coeficiente, coluna, tol, n_max):
         x_anterior = matriz_x.copy()
         for i in range(n):
             soma = 0
-            for j in range(n):  # calcula cada linha, ou seja o valor de xi
+            for j in range(n):  # calcula cada linha, ou seja, o valor de xi
                 if i != j:
                     soma += matriz_a[i, j] * matriz_x[j]
             temp = matriz_a[i, i]
             matriz_x[i] = (matriz_b[i] - soma) / temp
 
-        if norma(matriz_x, x_anterior) < tol:
+        if norma(x_anterior, matriz_x) < tol:
             return matriz_x
 
         k += 1

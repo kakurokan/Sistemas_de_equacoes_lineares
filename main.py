@@ -5,6 +5,31 @@ class IteracoesExcedidas(Exception):
     pass
 
 
+class DimensoesErradas(Exception):
+    pass
+
+
+def verifica_matriz(matriz, n):
+    for i in range(n):
+        if matriz[i, i] == 0:
+            return false
+    return true
+
+
+def escolha_metodo():
+    while True:
+        print("Escolha o método iterativo:\n",
+              "1) Gauss-Seidel\n",
+              "2) Gauss-Jacobi\n")
+        escolha = input("Digite o número (1 ou 2): ").strip()
+        if escolha == "1":
+            return "S"
+        elif escolha == "2":
+            return "J"
+        else:
+            print("\nErro: Entrada inválida. Por favor, digite apenas 1 ou 2.\n")
+
+
 def criar_matriz(elementos):
     matrix = [sympify(n) for n in elementos]
     return Matrix(matrix)
@@ -15,11 +40,9 @@ def norma(matriz_a, matriz_b):
     return max(resultado, key=abs)
 
 
-def gauss_seidel(n, coeficiente, coluna, tol, n_max):
+def seidel(n, coeficiente, coluna, tol, n_max):
     k = 0
-    elementos_x = []
-    for i in range(n):
-        elementos_x.append(0)
+    elementos_x = [0] * n
     matriz_x = criar_matriz(elementos_x)
     matriz_a = coeficiente.copy()
     matriz_b = coluna.copy()
@@ -70,37 +93,74 @@ def jacobi(n, coeficiente, coluna, tol, n_max):
 
 
 def main():
-    n = int(input("Insira o número de equações/incógnitas: "))
-    print(
-        "Escreva a matriz A (coeficientes) de tamanho n x n, separando as colunas por espaço e linhas por parágrafos:")
+    print("*" * 65)
+    print("   Bem-vindo ao Solucionador de sistemas lineares (Ax = B)")
+    print("*" * 65)
+    print("")
 
-    coeficientes = []
+    n = 0
+    rodando = true
 
-    for i in range(n):
-        numeros = input().split(" ")
-        coeficientes.append(numeros)
+    while rodando:
+        try:
+            n = int(input("Insira o número de equações/incógnitas: "))
+            if n <= 0:
+                raise ValueError("Número inválido")
 
-    matriz = criar_matriz(coeficientes)
+            print(
+                "Escreva a matriz A (coeficientes) de tamanho n x n, separando as colunas por espaço e linhas por parágrafos:")
+            coeficientes = []
 
-    pprint(matriz)
+            for i in range(n):
+                numeros = input().split(" ")
+                tamanho = len(numeros)
+                if tamanho > n or tamanho < n:  # Caso o utilizador tente inserir mais que n números na linha
+                    raise DimensoesErradas
+                coeficientes.append(numeros)
 
-    print("Escreva os valores da matriz coluna B de tamanho n, separados por espaço: ")
-    partes = input().split(" ")
-    coluna = criar_matriz(partes)
+            matriz = criar_matriz(coeficientes)
+            if not verifica_matriz(matriz, n):
+                print("\nErro: Pelo menos um elemento na diagonal principal é ZERO.",
+                      "\nOs métodos de Jacobi e Gauss-Seidel não podem ser",
+                      "executados, pois ambos exigem que a matriz seja invertível",
+                      "\nPor favor, verifique a sua matriz A e tente novamente.\n")
+                continue
 
-    tol = float(input("Insira a tolerância absoluta: "))
-    n_max = int(input("Insira o número máximo de iterações: "))
+            print("Escreva os valores da matriz coluna B de tamanho n, separados por espaço: ")
+            partes = input().split(" ")
+            tamanho = len(partes)
+            if tamanho > n or tamanho < n:  # Caso o utilizador tente inserir mais que n números na linha
+                raise DimensoesErradas
+            coluna = criar_matriz(partes)
 
-    try:
-        result = gauss_seidel(n, matriz, coluna, tol, n_max)
+            tol = float(input("Insira a tolerância absoluta: "))
+            n_max = int(input("Insira o número máximo de iterações: "))
+            if n_max <= 0:
+                raise ValueError("Erro: Número inválido\n")
 
-        def f(element):
-            return element.evalf(5)
+            escolha = escolha_metodo()
+            if escolha == "J":
+                result = jacobi(n, matriz, coluna, tol, n_max)
+            else:
+                result = seidel(n, matriz, coluna, tol, n_max)
 
-        pprint(result.applyfunc(f))
+            def f(element):  # Função que arredonda todos os valores da matriz para 5 casas decimais
+                return element.evalf(5)
 
-    except IteracoesExcedidas:
-        print("Número máximo de iterações excedido")
+            pprint(result.applyfunc(f))
+
+            rodando = input("Deseja continuar? (s/n) ").strip().lower() == "s"
+
+        except IteracoesExcedidas:
+            print("Erro: Número máximo de iterações excedido\n")
+        except DimensoesErradas:
+            print(f"Erro: A linha inserida não condiz com a dimensão fornecida. Tente novamente\n")
+        except SympifyError as e:
+            print(f"Erro de sintaxe: {e}")
+        except ValueError as e:
+            print(e)
+        except Exception as e:
+            print(f"Erro inesperado: {e}")
 
 
 main()

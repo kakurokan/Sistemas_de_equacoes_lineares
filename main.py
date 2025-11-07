@@ -9,19 +9,25 @@ class DimensoesErradas(Exception):
     pass
 
 
-def Diagonalmente_Dominante(matriz_a):
+def imprime_resultado(matriz, n):
+    print(f"⎧ x1 = {matriz[0]}")
+    for i in range(1, n - 1):
+        print(f"| x{i} = {matriz[i]}")
+    print(f"⎩ x{n} = {matriz[n - 1]}")
 
-    for i in range (len(matriz_a)):
+
+def diagonalmente_dominante(matriz, n):
+    for i in range(n):
         soma = 0
-        for j in range (len(matriz_a)):
-            soma += abs(matriz_a[i][j])
+        for j in range(n):
+            if i != j:
+                soma += abs(matriz[i, j])
 
-        soma -= abs(matriz_a[i][i])
-
-        if abs(matriz_a[i][i]) < soma:
+        if abs(matriz[i, i]) <= soma:
             return False
 
     return True
+
 
 def verifica_matriz(matriz, n):
     for i in range(n):
@@ -32,7 +38,7 @@ def verifica_matriz(matriz, n):
 
 def escolha_metodo():
     while True:
-        print("Escolha o método iterativo:\n",
+        print("\nEscolha o método iterativo:\n",
               "1) Gauss-Seidel\n",
               "2) Gauss-Jacobi\n")
         escolha = input("Digite o número (1 ou 2): ").strip()
@@ -138,6 +144,12 @@ def main():
                       "executados, pois ambos exigem que a matriz seja invertível",
                       "\nPor favor, verifique a sua matriz A e tente novamente.\n")
                 continue
+            if not diagonalmente_dominante(matriz, n):
+                print("\nAviso: A matriz inserida não é estritamente diagonalmente dominante!\n",
+                      "A convergência para a solução não é garantida\n")
+            else:
+                print("\nSucesso: A matriz inserida é estritamente diagonalmente dominante!",
+                      "\nIsso garante que o método irá convergir para a solução correta.\n")
 
             print("Escreva os valores da matriz coluna B de tamanho n, separados por espaço: ")
             partes = input().split(" ")
@@ -160,9 +172,10 @@ def main():
             def f(element):  # Função que arredonda todos os valores da matriz para 5 casas decimais
                 return element.evalf(5)
 
-            pprint(result.applyfunc(f))
+            print()
+            imprime_resultado(result.applyfunc(f), n)
 
-            rodando = input("Deseja continuar? (s/n) ").strip().lower() == "s"
+            rodando = input("\nDeseja continuar? (s/n) ").strip().lower() == "s"
 
         except IteracoesExcedidas:
             print("Erro: Número máximo de iterações excedido\n")

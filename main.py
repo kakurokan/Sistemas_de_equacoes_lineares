@@ -1,4 +1,4 @@
-from sympy import *
+from sympy import Matrix, sympify, SympifyError
 
 
 class IteracoesExcedidas(Exception):
@@ -32,8 +32,8 @@ def diagonalmente_dominante(matriz, n):
 def verifica_matriz(matriz, n):
     for i in range(n):
         if matriz[i, i] == 0:
-            return false
-    return true
+            return False
+    return True
 
 
 def escolha_metodo():
@@ -118,7 +118,7 @@ def main():
     print("*" * 65)
 
     n = 0
-    rodando = true
+    rodando = True
 
     while rodando:
         try:
@@ -126,12 +126,14 @@ def main():
             if n <= 0:
                 raise ValueError("Número inválido")
 
-            print(
-                "Escreva a matriz A (coeficientes) de tamanho n x n, separando as colunas por espaço e linhas por parágrafos:")
+            print(f"Insira a Matriz A ({n}x{n})",
+                  "\nDigite os coeficientes da matriz A, linha por linha.",
+                  f"\nAs {n} linhas devem conter exatamente {n} números separados por espaço.")
+
             coeficientes = []
 
             for i in range(n):
-                numeros = input().split(" ")
+                numeros = input(f"Insira a linha {i + 1}: ").split(" ")
                 tamanho = len(numeros)
                 if tamanho > n or tamanho < n:  # Caso o utilizador tente inserir mais que n números na linha
                     raise DimensoesErradas
@@ -151,14 +153,15 @@ def main():
                 print("\nSucesso: A matriz inserida é estritamente diagonalmente dominante!",
                       "\nIsso garante que o método irá convergir para a solução correta.\n")
 
-            print("Escreva os valores da matriz coluna B de tamanho n, separados por espaço: ")
-            partes = input().split(" ")
+            print(f"Insira a Matriz B ({n}x{1})",
+                  f"\nDigite os {n} valores da matriz B, separados por espaço.")
+            partes = input("Digite o vetor B: ").split(" ")
             tamanho = len(partes)
             if tamanho > n or tamanho < n:  # Caso o utilizador tente inserir mais que n números na linha
                 raise DimensoesErradas
             coluna = criar_matriz(partes)
 
-            tol = float(input("Insira a tolerância absoluta: "))
+            tol = float(input("\nInsira a tolerância absoluta: "))
             n_max = int(input("Insira o número máximo de iterações: "))
             if n_max <= 0:
                 raise ValueError("Erro: Número inválido\n")
@@ -172,7 +175,7 @@ def main():
             def f(element):  # Função que arredonda todos os valores da matriz para 5 casas decimais
                 return element.evalf(5)
 
-            print()
+            print("RESULTADO FINAL:")
             imprime_resultado(result.applyfunc(f), n)
 
             rodando = input("\nDeseja continuar? (s/n) ").strip().lower() == "s"

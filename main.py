@@ -101,7 +101,7 @@ def jacobi(n, coeficiente, coluna, tol, n_max):
                 matriz_a[i, j] /= divisor
         matriz_b[i, 0] /= ((-1) * divisor)
 
-    while k < n_max:
+    while k <= n_max:
         result = matriz_a * matriz_x + matriz_b
         if norma(matriz_x, result) < tol:
             return result
